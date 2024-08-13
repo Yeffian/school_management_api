@@ -37,3 +37,33 @@ func (m *StudentModel) All() ([]models.Student, error) {
 
 	return students, nil
 }
+
+func (m *StudentModel) FromFirstName(name string) (*models.Student, error) {
+	stmt := `SELECT * FROM students WHERE firstName = "` + name + `";`
+	row := m.DB.QueryRow(stmt)
+
+	s := models.Student{}
+	row.Scan(&s.StudentId, &s.FirstName, &s.LastName, &s.Email)
+
+	err := row.Err()
+	if err != nil {
+		return nil, err
+	}
+
+	return &s, nil
+}
+
+func (m *StudentModel) FromLastName(name string) (*models.Student, error) {
+	stmt := `SELECT * FROM students WHERE lastName = "` + name + `";`
+	row := m.DB.QueryRow(stmt)
+
+	s := models.Student{}
+	row.Scan(&s.StudentId, &s.FirstName, &s.LastName, &s.Email)
+
+	err := row.Err()
+	if err != nil {
+		return nil, err
+	}
+
+	return &s, nil
+}

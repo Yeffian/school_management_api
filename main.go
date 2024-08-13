@@ -63,11 +63,6 @@ func main() {
 		DB: db,
 	}
 
-	students, err := studentsDb.All()
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	PORT := os.Getenv("PORT")
 	app := fiber.New()
 
@@ -83,28 +78,35 @@ func main() {
 		return c.Status(404).JSON(fiber.Map{"msg": "No class found with that code."})
 	})
 
-	app.Get("/api/students/firstName/:firstName", func(c *fiber.Ctx) error {
-		firstName := c.Params("firstName")
-
-		for i := 0; i < 5; i++ {
-			if students[i].FirstName == firstName {
-				return c.Status(200).JSON(students[i])
-			}
+	app.Get("/api/students", func(c *fiber.Ctx) error {
+		rows, err := studentsDb.All()
+		if err != nil {
+			return c.Status(404).JSON(fiber.Map{"msg": "Error."})
 		}
 
-		return c.Status(404).JSON(fiber.Map{"msg": "No student found with that name."})
+		return c.Status(200).JSON(rows)
+	})
+
+	app.Get("/api/students/firstName/:firstName", func(c *fiber.Ctx) error {
+		firstName := c.Params("firstName")
+		student, err := studentsDb.FromFirstName(firstName)
+
+		if err != nil {
+			return c.Status(404).JSON(fiber.Map{"msg": "No student found with that name."})
+		}
+
+		return c.Status(200).JSON(student)
 	})
 
 	app.Get("/api/students/lastName/:lastName", func(c *fiber.Ctx) error {
 		lastName := c.Params("lastName")
+		student, err := studentsDb.FromLastName(lastName)
 
-		for i := 0; i < 5; i++ {
-			if students[i].LastName == lastName {
-				return c.Status(200).JSON(students[i])
-			}
+		if err != nil {
+			return c.Status(404).JSON(fiber.Map{"msg": "No student found with that name."})
 		}
 
-		return c.Status(404).JSON(fiber.Map{"msg": "No student found with that name."})
+		return c.Status(200).JSON(student)
 	})
 
 	app.Get("/api/teachers/firstName/:firstName", func(c *fiber.Ctx) error {
