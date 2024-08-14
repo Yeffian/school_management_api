@@ -48,7 +48,7 @@ func main() {
 
 	classes := [3]models.Class{*physicsClass, *mathClass, *englishClass}
 	// students := [5]models.Student{*adit, *john, *sarah, *mike, *kevin}
-	teachers := [3]models.Teacher{*josh, *jude, *mary}
+	// teachers := [3]models.Teacher{*josh, *jude, *mary}
 
 	if err := godotenv.Load(); err != nil {
 		log.Fatal("Error loading .env file.")
@@ -60,6 +60,10 @@ func main() {
 	}
 
 	studentsDb := sqlite.StudentModel{
+		DB: db,
+	}
+
+	teachersDb := sqlite.TeacherModel{
 		DB: db,
 	}
 
@@ -109,41 +113,45 @@ func main() {
 		return c.Status(200).JSON(student)
 	})
 
-	app.Get("/api/teachers/firstName/:firstName", func(c *fiber.Ctx) error {
-		firstName := c.Params("firstName")
-
-		for i := 0; i < 5; i++ {
-			if teachers[i].FirstName == firstName {
-				return c.Status(200).JSON(teachers[i])
-			}
+	app.Get("/api/teachers", func(c *fiber.Ctx) error {
+		rows, err := teachersDb.All()
+		if err != nil {
+			return c.Status(404).JSON(fiber.Map{"msg": "Error."})
 		}
 
-		return c.Status(404).JSON(fiber.Map{"msg": "No student found with that name."})
+		return c.Status(200).JSON(rows)
+	})
+
+	app.Get("/api/teachers/firstName/:firstName", func(c *fiber.Ctx) error {
+		firstName := c.Params("firstName")
+		teacher, err := teachersDb.FromFirstName(firstName)
+
+		if err != nil {
+			return c.Status(404).JSON(fiber.Map{"msg": "No student found with that name."})
+		}
+
+		return c.Status(200).JSON(teacher)
 	})
 
 	app.Get("/api/teachers/lastName/:lastName", func(c *fiber.Ctx) error {
 		lastName := c.Params("lastName")
+		teacher, err := teachersDb.FromLastName(lastName)
 
-		for i := 0; i < 5; i++ {
-			if teachers[i].LastName == lastName {
-				return c.Status(200).JSON(teachers[i])
-			}
+		if err != nil {
+			return c.Status(404).JSON(fiber.Map{"msg": "No student found with that name."})
 		}
 
-		return c.Status(404).JSON(fiber.Map{"msg": "No student found with that name."})
+		return c.Status(200).JSON(teacher)
 	})
 
 	app.Get("/api/teachers/:subject", func(c *fiber.Ctx) error {
 		subject := c.Params("subject")
-		var result []models.Teacher
-
-		for i := 0; i < 3; i++ {
-			if teachers[i].Subject == subject {
-				result = append(result, teachers[i])
-			}
+		rows, err := teachersDb.FromSubject(subject)
+		if err != nil {
+			return c.Status(404).JSON(fiber.Map{"msg": err.Error()})
 		}
 
-		return c.Status(200).JSON(result)
+		return c.Status(200).JSON(rows)
 	})
 
 	log.Fatal(app.Listen(":" + PORT))
