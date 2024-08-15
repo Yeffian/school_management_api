@@ -22,23 +22,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-	studentsDb := sqlite.StudentModel{
-		DB: db,
-	}
-
-	teachersDb := sqlite.TeacherModel{
-		DB: db,
-	}
-
-	classDb := sqlite.ClassModel{
-		DB: db,
-	}
+	dbProvider := sqlite.CreateDatabaseProvider(db)
 
 	PORT := os.Getenv("PORT")
 	app := fiber.New()
 
 	app.Get("/api/classes", func(c *fiber.Ctx) error {
-		rows, err := classDb.All()
+		rows, err := dbProvider.Class.All()
 		if err != nil {
 			return c.Status(404).JSON(fiber.Map{"msg": err.Error()})
 		}
@@ -47,7 +37,7 @@ func main() {
 	})
 
 	app.Get("/api/students", func(c *fiber.Ctx) error {
-		rows, err := studentsDb.All()
+		rows, err := dbProvider.Student.All()
 		if err != nil {
 			return c.Status(404).JSON(fiber.Map{"msg": err.Error()})
 		}
@@ -57,7 +47,7 @@ func main() {
 
 	app.Get("/api/students/firstName/:firstName", func(c *fiber.Ctx) error {
 		firstName := c.Params("firstName")
-		student, err := studentsDb.FromFirstName(firstName)
+		student, err := dbProvider.Student.FromFirstName(firstName)
 
 		if err != nil {
 			return c.Status(404).JSON(fiber.Map{"msg": "No student found with that name."})
@@ -69,7 +59,7 @@ func main() {
 	app.Get("/api/students/classes", func(c *fiber.Ctx) error {
 		classCode := c.Query("classCode")
 
-		rows, err := classDb.StudentsByClass(classCode)
+		rows, err := dbProvider.Class.StudentsByClass(classCode)
 		if err != nil {
 			return c.Status(404).JSON(fiber.Map{"msg": err.Error()})
 		}
@@ -79,7 +69,7 @@ func main() {
 
 	app.Get("/api/students/lastName/:lastName", func(c *fiber.Ctx) error {
 		lastName := c.Params("lastName")
-		student, err := studentsDb.FromLastName(lastName)
+		student, err := dbProvider.Student.FromLastName(lastName)
 
 		if err != nil {
 			return c.Status(404).JSON(fiber.Map{"msg": "No student found with that name."})
@@ -89,7 +79,7 @@ func main() {
 	})
 
 	app.Get("/api/teachers", func(c *fiber.Ctx) error {
-		rows, err := teachersDb.All()
+		rows, err := dbProvider.Teacher.All()
 		if err != nil {
 			return c.Status(404).JSON(fiber.Map{"msg": err.Error()})
 		}
@@ -99,7 +89,7 @@ func main() {
 
 	app.Get("/api/teachers/firstName/:firstName", func(c *fiber.Ctx) error {
 		firstName := c.Params("firstName")
-		teacher, err := teachersDb.FromFirstName(firstName)
+		teacher, err := dbProvider.Teacher.FromFirstName(firstName)
 
 		if err != nil {
 			return c.Status(404).JSON(fiber.Map{"msg": "No student found with that name."})
@@ -110,7 +100,7 @@ func main() {
 
 	app.Get("/api/teachers/lastName/:lastName", func(c *fiber.Ctx) error {
 		lastName := c.Params("lastName")
-		teacher, err := teachersDb.FromLastName(lastName)
+		teacher, err := dbProvider.Teacher.FromLastName(lastName)
 
 		if err != nil {
 			return c.Status(404).JSON(fiber.Map{"msg": "No student found with that name."})
@@ -121,7 +111,8 @@ func main() {
 
 	app.Get("/api/teachers/subjects/:subject", func(c *fiber.Ctx) error {
 		subject := c.Params("subject")
-		rows, err := teachersDb.FromSubject(subject)
+		rows, err := dbProvider.Teacher.FromSubject(subject)
+
 		if err != nil {
 			return c.Status(404).JSON(fiber.Map{"msg": err.Error()})
 		}
@@ -132,7 +123,7 @@ func main() {
 	app.Get("/api/teachers/classes", func(c *fiber.Ctx) error {
 		classCode := c.Query("classCode")
 
-		rows, err := classDb.TeachersByClass(classCode)
+		rows, err := dbProvider.Class.TeachersByClass(classCode)
 		if err != nil {
 			return c.Status(404).JSON(fiber.Map{"msg": err.Error()})
 		}
