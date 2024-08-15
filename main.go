@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/Yeffian/school_management_api/models"
 	"github.com/Yeffian/school_management_api/models/sqlite"
 	_ "github.com/mattn/go-sqlite3"
 
@@ -13,40 +12,28 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var (
-	adit  = models.NewStudent("Adit", "Charakbroty", "2056@someschool.edu")
-	john  = models.NewStudent("John", "Doe", "2187@someschool.edu")
-	sarah = models.NewStudent("Sarah", "Smith", "1780@someschool.edu")
-	mike  = models.NewStudent("Mike", "Doe", "8176@someschool.edu")
-	kevin = models.NewStudent("Kevin", "Mann", "9094@someschool.edu")
-)
+// var (
+// 	adit  = models.NewStudent("Adit", "Charakbroty", "2056@someschool.edu")
+// 	john  = models.NewStudent("John", "Doe", "2187@someschool.edu")
+// 	sarah = models.NewStudent("Sarah", "Smith", "1780@someschool.edu")
+// 	mike  = models.NewStudent("Mike", "Doe", "8176@someschool.edu")
+// 	kevin = models.NewStudent("Kevin", "Mann", "9094@someschool.edu")
+// )
 
-var (
-	josh = models.NewTeacher("Josh", "Brooks", "1298@teachers.someschool.edu", "physics")
-	jude = models.NewTeacher("Jude", "Smith", "1298@teachers.someschool.edu", "english")
-	mary = models.NewTeacher("Mary", "Afton", "1298@teachers.someschool.edu", "math")
-)
+// var (
+// 	josh = models.NewTeacher("Josh", "Brooks", "1298@teachers.someschool.edu", "physics")
+// 	jude = models.NewTeacher("Jude", "Smith", "1298@teachers.someschool.edu", "english")
+// 	mary = models.NewTeacher("Mary", "Afton", "1298@teachers.someschool.edu", "math")
+// )
 
-var (
-	physicsClass = models.NewClass("phys101")
-	mathClass    = models.NewClass("math101")
-	englishClass = models.NewClass("eng201")
-)
+// var (
+// 	physicsClass = models.NewClass("Physics 101", )
+// 	mathClass    = models.NewClass("math101")
+// 	englishClass = models.NewClass("eng201")
+// )
 
 func main() {
-	physicsClass.AddStudent(*adit)
-	physicsClass.AddStudent(*john)
-	physicsClass.AddStudent(*mike)
-
-	mathClass.AddStudent(*john)
-	mathClass.AddStudent(*mike)
-	mathClass.AddStudent(*kevin)
-
-	englishClass.AddStudent(*sarah)
-	englishClass.AddStudent(*mike)
-	englishClass.AddStudent(*adit)
-
-	classes := [3]models.Class{*physicsClass, *mathClass, *englishClass}
+	// classes := [3]models.Class{*physicsClass, *mathClass, *englishClass}
 	// students := [5]models.Student{*adit, *john, *sarah, *mike, *kevin}
 	// teachers := [3]models.Teacher{*josh, *jude, *mary}
 
@@ -67,25 +54,26 @@ func main() {
 		DB: db,
 	}
 
+	classDb := sqlite.ClassModel{
+		DB: db,
+	}
+
 	PORT := os.Getenv("PORT")
 	app := fiber.New()
 
-	app.Get("/api/classes/:code", func(c *fiber.Ctx) error {
-		classCode := c.Params("code")
-
-		for i := 0; i < 3; i++ {
-			if classes[i].ClassCode == classCode {
-				return c.Status(200).JSON(classes[i])
-			}
+	app.Get("/api/classes", func(c *fiber.Ctx) error {
+		rows, err := classDb.All()
+		if err != nil {
+			return c.Status(404).JSON(fiber.Map{"msg": err.Error()})
 		}
 
-		return c.Status(404).JSON(fiber.Map{"msg": "No class found with that code."})
+		return c.Status(200).JSON(rows)
 	})
 
 	app.Get("/api/students", func(c *fiber.Ctx) error {
 		rows, err := studentsDb.All()
 		if err != nil {
-			return c.Status(404).JSON(fiber.Map{"msg": "Error."})
+			return c.Status(404).JSON(fiber.Map{"msg": err.Error()})
 		}
 
 		return c.Status(200).JSON(rows)
@@ -116,7 +104,7 @@ func main() {
 	app.Get("/api/teachers", func(c *fiber.Ctx) error {
 		rows, err := teachersDb.All()
 		if err != nil {
-			return c.Status(404).JSON(fiber.Map{"msg": "Error."})
+			return c.Status(404).JSON(fiber.Map{"msg": err.Error()})
 		}
 
 		return c.Status(200).JSON(rows)

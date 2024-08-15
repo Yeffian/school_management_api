@@ -22,7 +22,7 @@ func (m *TeacherModel) All() ([]models.Teacher, error) {
 
 	for rows.Next() {
 		teacher := models.Teacher{}
-		err := rows.Scan(&teacher.TeacherId, &teacher.FirstName, &teacher.LastName, &teacher.Email, &teacher.Subject)
+		err := rows.Scan(&teacher.TeacherId, &teacher.FirstName, &teacher.LastName, &teacher.Email, &teacher.Subject, &teacher.ClassCode)
 		if err != nil {
 			return nil, err
 		}
@@ -43,7 +43,7 @@ func (m *TeacherModel) FromFirstName(name string) (*models.Teacher, error) {
 	row := m.DB.QueryRow(stmt)
 
 	t := models.Teacher{}
-	row.Scan(&t.TeacherId, &t.FirstName, &t.LastName, &t.Email, &t.Subject)
+	row.Scan(&t.TeacherId, &t.FirstName, &t.LastName, &t.Email, &t.Subject, &t.ClassCode)
 
 	err := row.Err()
 	if err != nil {
@@ -58,7 +58,7 @@ func (m *TeacherModel) FromLastName(name string) (*models.Teacher, error) {
 	row := m.DB.QueryRow(stmt)
 
 	t := models.Teacher{}
-	row.Scan(&t.TeacherId, &t.FirstName, &t.LastName, &t.Email, &t.Subject)
+	row.Scan(&t.TeacherId, &t.FirstName, &t.LastName, &t.Email, &t.Subject, &t.ClassCode)
 
 	err := row.Err()
 	if err != nil {
@@ -80,7 +80,7 @@ func (m *TeacherModel) FromSubject(subject string) ([]models.Teacher, error) {
 
 	for rows.Next() {
 		teacher := models.Teacher{}
-		err := rows.Scan(&teacher.TeacherId, &teacher.FirstName, &teacher.LastName, &teacher.Email, &teacher.Subject)
+		err := rows.Scan(&teacher.TeacherId, &teacher.FirstName, &teacher.LastName, &teacher.Email, &teacher.Subject, &teacher.ClassCode)
 		if err != nil {
 			return nil, err
 		}

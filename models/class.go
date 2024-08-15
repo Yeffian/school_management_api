@@ -1,21 +1,13 @@
 package models
 
 type Class struct {
-	ClassCode string    `json:"classCode"`
-	Students  []Student `json:"students"`
-	Teachers  []Teacher `json:"teachers"`
+	ClassCode string `json:"classCode"`
+	Subject   string `json:"subject"`
 }
 
-func NewClass(code string) *Class {
+func NewClass(code string, subject string) *Class {
 	return &Class{
 		ClassCode: code,
+		Subject:   subject,
 	}
-}
-
-func (class *Class) AddStudent(student Student) {
-	class.Students = append(class.Students, student)
-}
-
-func (class *Class) AddTeacher(teacher Teacher) {
-	class.Teachers = append(class.Teachers, teacher)
 }

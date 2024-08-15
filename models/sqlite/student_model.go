@@ -22,7 +22,7 @@ func (m *StudentModel) All() ([]models.Student, error) {
 
 	for rows.Next() {
 		student := models.Student{}
-		err := rows.Scan(&student.StudentId, &student.FirstName, &student.LastName, &student.Email)
+		err := rows.Scan(&student.StudentId, &student.FirstName, &student.LastName, &student.Email, &student.ClassCode)
 		if err != nil {
 			return nil, err
 		}
@@ -43,7 +43,7 @@ func (m *StudentModel) FromFirstName(name string) (*models.Student, error) {
 	row := m.DB.QueryRow(stmt)
 
 	s := models.Student{}
-	row.Scan(&s.StudentId, &s.FirstName, &s.LastName, &s.Email)
+	row.Scan(&s.StudentId, &s.FirstName, &s.LastName, &s.Email, &s.ClassCode)
 
 	err := row.Err()
 	if err != nil {
@@ -58,7 +58,7 @@ func (m *StudentModel) FromLastName(name string) (*models.Student, error) {
 	row := m.DB.QueryRow(stmt)
 
 	s := models.Student{}
-	row.Scan(&s.StudentId, &s.FirstName, &s.LastName, &s.Email)
+	row.Scan(&s.StudentId, &s.FirstName, &s.LastName, &s.Email, &s.ClassCode)
 
 	err := row.Err()
 	if err != nil {
