@@ -37,3 +37,49 @@ func (m *ClassModel) All() ([]models.Class, error) {
 
 	return classes, nil
 }
+
+func (m *ClassModel) TeachersByClass(class string) ([]models.Teacher, error) {
+	stmt := `SELECT * FROM teachers WHERE classCode = "` + class + `";`
+	rows, err := m.DB.Query(stmt)
+
+	if err != nil {
+		return nil, err
+	}
+
+	teachers := []models.Teacher{}
+
+	for rows.Next() {
+		teacher := models.Teacher{}
+		err := rows.Scan(&teacher.TeacherId, &teacher.FirstName, &teacher.LastName, &teacher.Email, &teacher.Subject, &teacher.ClassCode)
+		if err != nil {
+			return nil, err
+		}
+
+		teachers = append(teachers, teacher)
+	}
+
+	return teachers, nil
+}
+
+func (m *ClassModel) StudentsByClass(class string) ([]models.Student, error) {
+	stmt := `SELECT * FROM students WHERE classCode = "` + class + `";`
+	rows, err := m.DB.Query(stmt)
+
+	if err != nil {
+		return nil, err
+	}
+
+	students := []models.Student{}
+
+	for rows.Next() {
+		student := models.Student{}
+		err := rows.Scan(&student.StudentId, &student.FirstName, &student.LastName, &student.Email, &student.ClassCode)
+		if err != nil {
+			return nil, err
+		}
+
+		students = append(students, student)
+	}
+
+	return students, nil
+}

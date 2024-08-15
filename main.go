@@ -90,6 +90,17 @@ func main() {
 		return c.Status(200).JSON(student)
 	})
 
+	app.Get("/api/students/classes", func(c *fiber.Ctx) error {
+		classCode := c.Query("classCode")
+
+		rows, err := classDb.StudentsByClass(classCode)
+		if err != nil {
+			return c.Status(404).JSON(fiber.Map{"msg": err.Error()})
+		}
+
+		return c.Status(200).JSON(rows)
+	})
+
 	app.Get("/api/students/lastName/:lastName", func(c *fiber.Ctx) error {
 		lastName := c.Params("lastName")
 		student, err := studentsDb.FromLastName(lastName)
@@ -132,9 +143,20 @@ func main() {
 		return c.Status(200).JSON(teacher)
 	})
 
-	app.Get("/api/teachers/:subject", func(c *fiber.Ctx) error {
+	app.Get("/api/teachers/subjects/:subject", func(c *fiber.Ctx) error {
 		subject := c.Params("subject")
 		rows, err := teachersDb.FromSubject(subject)
+		if err != nil {
+			return c.Status(404).JSON(fiber.Map{"msg": err.Error()})
+		}
+
+		return c.Status(200).JSON(rows)
+	})
+
+	app.Get("/api/teachers/classes", func(c *fiber.Ctx) error {
+		classCode := c.Query("classCode")
+
+		rows, err := classDb.TeachersByClass(classCode)
 		if err != nil {
 			return c.Status(404).JSON(fiber.Map{"msg": err.Error()})
 		}
