@@ -38,7 +38,18 @@ func (m *StudentModel) All() ([]models.Student, error) {
 	return students, nil
 }
 
-func (m *StudentModel) FromFirstName(name string) (*models.Student, error) {
+func (m *StudentModel) New(student models.Student) error {
+	stmt := `INSERT INTO students VALUES($1, $2, $3, $4, $5)`
+	_, err := m.DB.Exec(stmt, student.StudentId, student.FirstName, student.LastName, student.Email, student.ClassCode)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *StudentModel) ByFirstName(name string) (*models.Student, error) {
 	stmt := `SELECT * FROM students WHERE firstName = "` + name + `";`
 	row := m.DB.QueryRow(stmt)
 
@@ -53,7 +64,7 @@ func (m *StudentModel) FromFirstName(name string) (*models.Student, error) {
 	return &s, nil
 }
 
-func (m *StudentModel) FromLastName(name string) (*models.Student, error) {
+func (m *StudentModel) ByLastName(name string) (*models.Student, error) {
 	stmt := `SELECT * FROM students WHERE lastName = "` + name + `";`
 	row := m.DB.QueryRow(stmt)
 

@@ -38,7 +38,7 @@ func (m *TeacherModel) All() ([]models.Teacher, error) {
 	return teachers, nil
 }
 
-func (m *TeacherModel) FromFirstName(name string) (*models.Teacher, error) {
+func (m *TeacherModel) ByFirstName(name string) (*models.Teacher, error) {
 	stmt := `SELECT * FROM teachers WHERE firstName = "` + name + `";`
 	row := m.DB.QueryRow(stmt)
 
@@ -53,7 +53,7 @@ func (m *TeacherModel) FromFirstName(name string) (*models.Teacher, error) {
 	return &t, nil
 }
 
-func (m *TeacherModel) FromLastName(name string) (*models.Teacher, error) {
+func (m *TeacherModel) ByLastName(name string) (*models.Teacher, error) {
 	stmt := `SELECT * FROM teachers WHERE lastName = "` + name + `";`
 	row := m.DB.QueryRow(stmt)
 
@@ -68,7 +68,7 @@ func (m *TeacherModel) FromLastName(name string) (*models.Teacher, error) {
 	return &t, nil
 }
 
-func (m *TeacherModel) FromSubject(subject string) ([]models.Teacher, error) {
+func (m *TeacherModel) BySubject(subject string) ([]models.Teacher, error) {
 	stmt := `SELECT * FROM teachers WHERE subject = "` + subject + `"`
 	rows, err := m.DB.Query(stmt)
 

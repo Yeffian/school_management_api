@@ -62,9 +62,25 @@ func main() {
 		return c.Status(200).JSON(rows)
 	})
 
+	app.Post("/api/students/new", func(c *fiber.Ctx) error {
+		s := &models.Student{}
+
+		if err := c.BodyParser(s); err != nil {
+			return c.Status(400).JSON(fiber.Map{"msg": err.Error()})
+		}
+
+		err = dbProvider.Student.New(*s)
+
+		if err != nil {
+			return c.Status(400).JSON(fiber.Map{"msg": err.Error()})
+		}
+
+		return c.Status(200).JSON(s)
+	})
+
 	app.Get("/api/students/firstName/:firstName", func(c *fiber.Ctx) error {
 		firstName := c.Params("firstName")
-		student, err := dbProvider.Student.FromFirstName(firstName)
+		student, err := dbProvider.Student.ByFirstName(firstName)
 
 		if err != nil {
 			return c.Status(404).JSON(fiber.Map{"msg": "No student found with that name."})
@@ -86,7 +102,7 @@ func main() {
 
 	app.Get("/api/students/lastName/:lastName", func(c *fiber.Ctx) error {
 		lastName := c.Params("lastName")
-		student, err := dbProvider.Student.FromLastName(lastName)
+		student, err := dbProvider.Student.ByLastName(lastName)
 
 		if err != nil {
 			return c.Status(404).JSON(fiber.Map{"msg": "No student found with that name."})
@@ -106,7 +122,7 @@ func main() {
 
 	app.Get("/api/teachers/firstName/:firstName", func(c *fiber.Ctx) error {
 		firstName := c.Params("firstName")
-		teacher, err := dbProvider.Teacher.FromFirstName(firstName)
+		teacher, err := dbProvider.Teacher.ByFirstName(firstName)
 
 		if err != nil {
 			return c.Status(404).JSON(fiber.Map{"msg": "No student found with that name."})
@@ -117,7 +133,7 @@ func main() {
 
 	app.Get("/api/teachers/lastName/:lastName", func(c *fiber.Ctx) error {
 		lastName := c.Params("lastName")
-		teacher, err := dbProvider.Teacher.FromLastName(lastName)
+		teacher, err := dbProvider.Teacher.ByLastName(lastName)
 
 		if err != nil {
 			return c.Status(404).JSON(fiber.Map{"msg": "No student found with that name."})
@@ -128,7 +144,7 @@ func main() {
 
 	app.Get("/api/teachers/subjects/:subject", func(c *fiber.Ctx) error {
 		subject := c.Params("subject")
-		rows, err := dbProvider.Teacher.FromSubject(subject)
+		rows, err := dbProvider.Teacher.BySubject(subject)
 
 		if err != nil {
 			return c.Status(404).JSON(fiber.Map{"msg": err.Error()})
