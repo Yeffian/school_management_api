@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/Yeffian/school_management_api/models"
 	"github.com/Yeffian/school_management_api/models/sqlite"
 	_ "github.com/mattn/go-sqlite3"
 
@@ -34,6 +35,19 @@ func main() {
 		}
 
 		return c.Status(200).JSON(rows)
+	})
+
+	app.Post("/api/classes/new", func(c *fiber.Ctx) error {
+		class := &models.Class{}
+
+		if err := c.BodyParser(class); err != nil {
+			return c.Status(400).JSON(fiber.Map{"msg": err.Error()})
+		}
+
+		log.Println(class.ClassCode)
+		log.Println(class.Subject)
+
+		return c.Status(200).JSON(class)
 	})
 
 	app.Get("/api/students", func(c *fiber.Ctx) error {
