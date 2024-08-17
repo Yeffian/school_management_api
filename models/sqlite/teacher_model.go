@@ -38,6 +38,17 @@ func (m *TeacherModel) All() ([]models.Teacher, error) {
 	return teachers, nil
 }
 
+func (m *TeacherModel) New(teacher models.Teacher) error {
+	stmt := `INSERT INTO teachers VALUES($1, $2, $3, $4, $5, $6)`
+	_, err := m.DB.Exec(stmt, teacher.TeacherId, teacher.FirstName, teacher.LastName, teacher.Email, teacher.Subject, teacher.ClassCode)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (m *TeacherModel) ByFirstName(name string) (*models.Teacher, error) {
 	stmt := `SELECT * FROM teachers WHERE firstName = "` + name + `";`
 	row := m.DB.QueryRow(stmt)

@@ -120,6 +120,22 @@ func main() {
 		return c.Status(200).JSON(rows)
 	})
 
+	app.Post("/api/teachers/new", func(c *fiber.Ctx) error {
+		t := &models.Teacher{}
+
+		if err := c.BodyParser(t); err != nil {
+			return c.Status(400).JSON(fiber.Map{"msg": err.Error()})
+		}
+
+		err = dbProvider.Teacher.New(*t)
+
+		if err != nil {
+			return c.Status(400).JSON(fiber.Map{"msg": err.Error()})
+		}
+
+		return c.Status(200).JSON(t)
+	})
+
 	app.Get("/api/teachers/firstName/:firstName", func(c *fiber.Ctx) error {
 		firstName := c.Params("firstName")
 		teacher, err := dbProvider.Teacher.ByFirstName(firstName)
