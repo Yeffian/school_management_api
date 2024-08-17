@@ -38,6 +38,13 @@ func (m *ClassModel) All() ([]models.Class, error) {
 	return classes, nil
 }
 
+func (m *ClassModel) New(classCode string, subject string) (*models.Class, error) {
+	stmt := `INSERT INTO classes VALUES($1, $2)`
+	_, _ = m.DB.Exec(stmt, classCode, subject)
+
+	return &models.Class{ClassCode: classCode, Subject: subject}, nil
+}
+
 func (m *ClassModel) TeachersByClass(class string) ([]models.Teacher, error) {
 	stmt := `SELECT * FROM teachers WHERE classCode = "` + class + `";`
 	rows, err := m.DB.Query(stmt)

@@ -38,16 +38,19 @@ func main() {
 	})
 
 	app.Post("/api/classes/new", func(c *fiber.Ctx) error {
-		class := &models.Class{}
+		cl := &models.Class{}
 
-		if err := c.BodyParser(class); err != nil {
+		if err := c.BodyParser(cl); err != nil {
 			return c.Status(400).JSON(fiber.Map{"msg": err.Error()})
 		}
 
-		log.Println(class.ClassCode)
-		log.Println(class.Subject)
+		cl, err = dbProvider.Class.New(cl.ClassCode, cl.Subject)
 
-		return c.Status(200).JSON(class)
+		if err != nil {
+			return c.Status(400).JSON(fiber.Map{"msg": err.Error()})
+		}
+
+		return c.Status(200).JSON(cl)
 	})
 
 	app.Get("/api/students", func(c *fiber.Ctx) error {
