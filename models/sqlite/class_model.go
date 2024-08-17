@@ -40,7 +40,11 @@ func (m *ClassModel) All() ([]models.Class, error) {
 
 func (m *ClassModel) New(classCode string, subject string) (*models.Class, error) {
 	stmt := `INSERT INTO classes VALUES($1, $2)`
-	_, _ = m.DB.Exec(stmt, classCode, subject)
+	_, err := m.DB.Exec(stmt, classCode, subject)
+
+	if err != nil {
+		return nil, err
+	}
 
 	return &models.Class{ClassCode: classCode, Subject: subject}, nil
 }
