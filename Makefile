@@ -1,4 +1,4 @@
-.PHONY: build run
+.PHONY: build- run
 
 build:
 	go build -o build/school_management
